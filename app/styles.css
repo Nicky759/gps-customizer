@@ -1,0 +1,102 @@
+:root {
+    color-scheme: dark;
+    font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+    background: #202020;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#map {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    overflow: hidden;
+    background: #6aa84f;
+}
+
+#map {
+    position: absolute;
+    inset: 0;
+}
+
+/* Laat de lager gerenderde canvaspixels scherp opschalen. */
+.maplibregl-canvas {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.hud {
+    position: fixed;
+    z-index: 10;
+    top: 16px;
+    left: 16px;
+    max-width: min(420px, calc(100vw - 90px));
+    padding: 12px 16px;
+    color: #ffffff;
+    background: rgba(32, 32, 32, 0.94);
+    border: 4px solid #111111;
+    border-radius: 0;
+    box-shadow:
+        inset 0 0 0 2px #777777,
+        6px 6px 0 rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+}
+
+.hud h1 {
+    margin: 0;
+    font-size: clamp(15px, 2vw, 20px);
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 0 #000000;
+}
+
+.hud p {
+    margin: 7px 0 0;
+    color: #d7d7d7;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.maplibregl-ctrl-group {
+    overflow: hidden;
+    background: #d0d0d0;
+    border: 3px solid #202020;
+    border-radius: 0;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.35);
+}
+
+.maplibregl-ctrl-group button,
+.maplibregl-ctrl-group button:first-child,
+.maplibregl-ctrl-group button:last-child {
+    border-radius: 0;
+}
+
+.maplibregl-ctrl-attrib {
+    color: #eeeeee;
+    background: rgba(32, 32, 32, 0.85) !important;
+    border-radius: 0;
+    font-family: inherit;
+}
+
+.maplibregl-ctrl-attrib a {
+    color: #ffffff;
+}
+
+noscript {
+    position: fixed;
+    z-index: 20;
+    inset: 20px;
+    height: fit-content;
+    padding: 16px;
+    background: #202020;
+    border: 4px solid #b02e26;
+    color: #ffffff;
+}
