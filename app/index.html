@@ -2,6 +2,7 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
@@ -11,7 +12,7 @@
 
     <link
         rel="stylesheet"
-        href="https://unpkg.com/maplibre-gl@^6.1.0/dist/maplibre-gl.css"
+        href="https://unpkg.com/maplibre-gl@6.1.0/dist/maplibre-gl.css"
     >
 
     <style>
@@ -22,15 +23,51 @@
             height: 100%;
             margin: 0;
         }
+
+        body {
+            background: #78a956;
+            font-family: monospace;
+        }
+
+        #title {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 10;
+
+            padding: 12px 16px;
+
+            color: white;
+            background: rgba(35, 35, 35, 0.9);
+
+            border: 4px solid #111;
+            box-shadow:
+                inset 0 0 0 2px #777,
+                5px 5px 0 rgba(0, 0, 0, 0.4);
+
+            font-size: 16px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .maplibregl-ctrl-group {
+            border: 3px solid #222;
+            border-radius: 0;
+        }
+
+        .maplibregl-ctrl-group button {
+            border-radius: 0;
+        }
     </style>
 </head>
 
 <body>
+<div id="title">MINECRAFT NAVIGATION</div>
 <div id="map"></div>
 
 <script type="module">
     import * as maplibregl
-        from "https://unpkg.com/maplibre-gl@^6.1.0/dist/maplibre-gl.mjs";
+        from "https://unpkg.com/maplibre-gl@6.1.0/dist/maplibre-gl.mjs";
 
     const map = new maplibregl.Map({
         container: "map",
@@ -40,17 +77,266 @@
         // Assen
         center: [6.562, 52.992],
 
-        zoom: 13,
-
+        zoom: 14,
         pitch: 45,
+        bearing: 0,
 
-        bearing: 0
+        antialias: true
     });
 
     map.addControl(
         new maplibregl.NavigationControl(),
         "top-right"
     );
+
+    map.on("load", () => {
+        applyMinecraftStyle();
+    });
+
+    function setPaint(layerId, property, value) {
+        try {
+            map.setPaintProperty(layerId, property, value);
+        } catch (error) {
+            console.debug(
+                `Kon ${property} niet aanpassen voor ${layerId}`
+            );
+        }
+    }
+
+    function applyMinecraftStyle() {
+        const style = map.getStyle();
+        const layers = style.layers ?? [];
+
+        for (const layer of layers) {
+            const id = layer.id.toLowerCase();
+            const type = layer.type;
+            const sourceLayer = layer["source-layer"];
+
+            /*
+             * Achtergrond
+             */
+            if (type === "background") {
+                setPaint(
+                    layer.id,
+                    "background-color",
+                    "#78a956"
+                );
+            }
+
+            /*
+             * Water
+             */
+            if (sourceLayer === "water") {
+                if (type === "fill") {
+                    setPaint(
+                        layer.id,
+                        "fill-color",
+                        "#3f76e4"
+                    );
+
+                    setPaint(
+                        layer.id,
+                        "fill-opacity",
+                        1
+                    );
+
+                    setPaint(
+                        layer.id,
+                        "fill-outline-color",
+                        "#2a55b0"
+                    );
+                }
+
+                if (type === "line") {
+                    setPaint(
+                        layer.id,
+                        "line-color",
+                        "#2a55b0"
+                    );
+                }
+            }
+
+            /*
+             * Gras, bos en natuur
+             */
+            if (
+                sourceLayer === "landcover" ||
+                sourceLayer === "landuse"
+            ) {
+                if (type === "fill") {
+                    let color = "#78a956";
+
+                    if (
+                        id.includes("forest") ||
+                        id.includes("wood")
+                    ) {
+                        color = "#3b7d3b";
+                    }
+
+                    if (
+                        id.includes("park") ||
+                        id.includes("grass")
+                    ) {
+                        color = "#67a849";
+                    }
+
+                    if (
+                        id.includes("sand") ||
+                        id.includes("beach")
+                    ) {
+                        color = "#d8c77a";
+                    }
+
+                    setPaint(
+                        layer.id,
+                        "fill-color",
+                        color
+                    );
+
+                    setPaint(
+                        layer.id,
+                        "fill-opacity",
+                        0.9
+                    );
+                }
+            }
+
+            /*
+             * Gebouwen
+             */
+            if (sourceLayer === "building") {
+                if (type === "fill") {
+                    setPaint(
+                        layer.id,
+                        "fill-color",
+                        "#9b7653"
+                    );
+
+                    setPaint(
+                        layer.id,
+                        "fill-outline-color",
+                        "#59452f"
+                    );
+
+                    setPaint(
+                        layer.id,
+                        "fill-opacity",
+                        1
+                    );
+                }
+
+                if (type === "fill-extrusion") {
+                    setPaint(
+                        layer.id,
+                        "fill-extrusion-color",
+                        "#9b7653"
+                    );
+
+                    setPaint(
+                        layer.id,
+                        "fill-extrusion-opacity",
+                        1
+                    );
+                }
+            }
+
+            /*
+             * Wegen
+             */
+            if (
+                sourceLayer === "transportation" &&
+                type === "line"
+            ) {
+                let roadColor = "#8b8b8b";
+
+                if (
+                    id.includes("motorway") ||
+                    id.includes("trunk")
+                ) {
+                    roadColor = "#d4b04c";
+                } else if (
+                    id.includes("primary") ||
+                    id.includes("secondary")
+                ) {
+                    roadColor = "#baa574";
+                } else if (
+                    id.includes("path") ||
+                    id.includes("track")
+                ) {
+                    roadColor = "#8a6845";
+                }
+
+                setPaint(
+                    layer.id,
+                    "line-color",
+                    roadColor
+                );
+
+                setPaint(
+                    layer.id,
+                    "line-opacity",
+                    1
+                );
+            }
+
+            /*
+             * Spoorwegen
+             */
+            if (
+                sourceLayer === "transportation" &&
+                id.includes("rail")
+            ) {
+                setPaint(
+                    layer.id,
+                    "line-color",
+                    "#3f3f3f"
+                );
+            }
+
+            /*
+             * Plaatsnamen en labels
+             */
+            if (type === "symbol") {
+                setPaint(
+                    layer.id,
+                    "text-color",
+                    "#202020"
+                );
+
+                setPaint(
+                    layer.id,
+                    "text-halo-color",
+                    "#f1e6c8"
+                );
+
+                setPaint(
+                    layer.id,
+                    "text-halo-width",
+                    2
+                );
+            }
+
+            /*
+             * Grenzen
+             */
+            if (
+                sourceLayer === "boundary" &&
+                type === "line"
+            ) {
+                setPaint(
+                    layer.id,
+                    "line-color",
+                    "#444444"
+                );
+            }
+        }
+
+        console.log("Minecraftstijl is toegepast!");
+    }
+
+    map.on("error", event => {
+        console.error("Kaartfout:", event.error);
+    });
 </script>
 </body>
 </html>
