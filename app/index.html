@@ -2,7 +2,12 @@
 <html lang="nl">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
     <meta name="theme-color" content="#202020">
 
     <title>Minecraft Navigation</title>
@@ -11,20 +16,26 @@
         rel="stylesheet"
         href="https://unpkg.com/maplibre-gl@6.1.0/dist/maplibre-gl.css"
     >
+
     <link rel="stylesheet" href="/styles.css">
 </head>
+
 <body>
-    <header class="hud" aria-label="Kaartinformatie">
+    <header class="minecraft-hud">
         <h1>Minecraft Navigation</h1>
         <p id="status">Kaart laden...</p>
     </header>
 
-    <main id="map" aria-label="Interactieve Minecraft-kaart"></main>
+    <main
+        id="map"
+        aria-label="Minecraft navigatiekaart"
+    ></main>
 
     <noscript>
         JavaScript moet ingeschakeld zijn om de kaart te gebruiken.
     </noscript>
 
-    <script type="module" src="/app.js"></script>
+    <script src="https://unpkg.com/maplibre-gl@6.1.0/dist/maplibre-gl.js"></script>
+    <script src="/app.js"></script>
 </body>
 </html>
