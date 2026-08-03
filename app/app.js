@@ -1,13 +1,20 @@
 "use strict";
 
-console.log("app.js is geladen");
+import * as maplibregl from
+    "https://unpkg.com/maplibre-gl@6.1.0/dist/maplibre-gl.mjs";
 
-const statusElement = document.getElementById("status");
+const statusElement =
+    document.getElementById("status");
+
+let minecraftStyleApplied = false;
+
+setStatus("Kaartstijl laden...");
 
 const map = new maplibregl.Map({
     container: "map",
 
-    style: "https://tiles.openfreemap.org/styles/liberty",
+    style:
+        "https://tiles.openfreemap.org/styles/liberty",
 
     center: [6.562, 52.992],
 
@@ -43,16 +50,24 @@ map.addControl(
     "bottom-left"
 );
 
-map.on("load", function () {
+map.on("style.load", function () {
+    if (minecraftStyleApplied) {
+        return;
+    }
+
     try {
+        setStatus("Minecraftstijl toepassen...");
+
         registerMinecraftTextures();
         applyMinecraftStyle();
         addGreyBuildings();
 
+        minecraftStyleApplied = true;
+
         setStatus("Minecraftkaart geladen");
 
         console.log(
-            "Minecraftstijl is succesvol geladen"
+            "Minecraftstijl succesvol geladen"
         );
     } catch (error) {
         console.error(
@@ -67,15 +82,26 @@ map.on("load", function () {
 });
 
 map.on("error", function (event) {
+    const message =
+        event.error?.message ||
+        "Onbekende kaartfout";
+
     console.error(
         "MapLibre-fout:",
         event.error
     );
+
+    if (!minecraftStyleApplied) {
+        setStatus(
+            "Kaartfout: " + message
+        );
+    }
 });
 
 function setStatus(message) {
     if (statusElement) {
-        statusElement.textContent = message;
+        statusElement.textContent =
+            message;
     }
 }
 
@@ -106,25 +132,28 @@ function addTexture(name, canvas) {
         return;
     }
 
-    const context = canvas.getContext(
-        "2d",
-        {
-            willReadFrequently: true
-        }
-    );
+    const context =
+        canvas.getContext(
+            "2d",
+            {
+                willReadFrequently: true
+            }
+        );
 
     if (!context) {
         throw new Error(
-            "Kon textuur niet aanmaken: " + name
+            "Kon textuur niet maken: " +
+            name
         );
     }
 
-    const imageData = context.getImageData(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
+    const imageData =
+        context.getImageData(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
 
     map.addImage(
         name,
@@ -151,7 +180,8 @@ function createTextureCanvas() {
         );
     }
 
-    context.imageSmoothingEnabled = false;
+    context.imageSmoothingEnabled =
+        false;
 
     return {
         canvas: canvas,
@@ -160,9 +190,14 @@ function createTextureCanvas() {
 }
 
 function createGrassTexture() {
-    const texture = createTextureCanvas();
-    const canvas = texture.canvas;
-    const context = texture.context;
+    const texture =
+        createTextureCanvas();
+
+    const canvas =
+        texture.canvas;
+
+    const context =
+        texture.context;
 
     context.fillStyle = "#5f9f3f";
     context.fillRect(0, 0, 16, 16);
@@ -231,9 +266,14 @@ function createGrassTexture() {
 }
 
 function createDarkGrassTexture() {
-    const texture = createTextureCanvas();
-    const canvas = texture.canvas;
-    const context = texture.context;
+    const texture =
+        createTextureCanvas();
+
+    const canvas =
+        texture.canvas;
+
+    const context =
+        texture.context;
 
     context.fillStyle = "#356f35";
     context.fillRect(0, 0, 16, 16);
@@ -289,9 +329,14 @@ function createDarkGrassTexture() {
 }
 
 function createWaterTexture() {
-    const texture = createTextureCanvas();
-    const canvas = texture.canvas;
-    const context = texture.context;
+    const texture =
+        createTextureCanvas();
+
+    const canvas =
+        texture.canvas;
+
+    const context =
+        texture.context;
 
     context.fillStyle = "#2456b3";
     context.fillRect(0, 0, 16, 16);
@@ -329,9 +374,14 @@ function createWaterTexture() {
 }
 
 function createSandTexture() {
-    const texture = createTextureCanvas();
-    const canvas = texture.canvas;
-    const context = texture.context;
+    const texture =
+        createTextureCanvas();
+
+    const canvas =
+        texture.canvas;
+
+    const context =
+        texture.context;
 
     context.fillStyle = "#d8c77a";
     context.fillRect(0, 0, 16, 16);
@@ -387,8 +437,8 @@ function drawPixels(
 }
 
 function applyMinecraftStyle() {
-    const style = map.getStyle();
-    const layers = style.layers || [];
+    const layers =
+        map.getStyle().layers || [];
 
     for (const layer of layers) {
         const id =
@@ -655,8 +705,8 @@ function styleLabelLayer(layer, id) {
 }
 
 function addGreyBuildings() {
-    const style = map.getStyle();
-    const layers = style.layers || [];
+    const layers =
+        map.getStyle().layers || [];
 
     const buildingReference =
         layers.find(function (layer) {
@@ -744,14 +794,16 @@ function addGreyBuildings() {
 
     addLayerBeforeLabels(
         {
-            id: "minecraft-building-ground",
+            id:
+                "minecraft-building-ground",
 
             type: "fill",
 
             source:
                 buildingReference.source,
 
-            "source-layer": "building",
+            "source-layer":
+                "building",
 
             minzoom: 13,
 
@@ -766,14 +818,16 @@ function addGreyBuildings() {
 
     addLayerBeforeLabels(
         {
-            id: "minecraft-building-outline",
+            id:
+                "minecraft-building-outline",
 
             type: "line",
 
             source:
                 buildingReference.source,
 
-            "source-layer": "building",
+            "source-layer":
+                "building",
 
             minzoom: 13,
 
@@ -794,14 +848,16 @@ function addGreyBuildings() {
 
     addLayerBeforeLabels(
         {
-            id: "minecraft-buildings-3d",
+            id:
+                "minecraft-buildings-3d",
 
             type: "fill-extrusion",
 
             source:
                 buildingReference.source,
 
-            "source-layer": "building",
+            "source-layer":
+                "building",
 
             minzoom: 14,
 
@@ -857,9 +913,10 @@ function safeSetPaint(
         );
     } catch (error) {
         console.debug(
-            "Paint property overgeslagen:",
+            "Paint overgeslagen:",
             layerId,
-            property
+            property,
+            error
         );
     }
 }
@@ -877,9 +934,10 @@ function safeSetLayout(
         );
     } catch (error) {
         console.debug(
-            "Layout property overgeslagen:",
+            "Layout overgeslagen:",
             layerId,
-            property
+            property,
+            error
         );
     }
 }
